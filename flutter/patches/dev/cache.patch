@@ -1,0 +1,64 @@
+diff --git a/bin/internal/shared.sh b/bin/internal/shared.sh
+index c44f867746..c9eda34e26 100644
+--- a/bin/internal/shared.sh
++++ b/bin/internal/shared.sh
+@@ -218,8 +218,6 @@ function shared::execute() {
+   # FLUTTER_TOOL_ARGS="--enable-asserts $FLUTTER_TOOL_ARGS"
+   # FLUTTER_TOOL_ARGS="$FLUTTER_TOOL_ARGS --observe=65432"
+ 
+-  upgrade_flutter 7< "$PROG_NAME"
+-
+   BIN_NAME="$(basename "$PROG_NAME")"
+   case "$BIN_NAME" in
+     flutter*)
+diff --git a/packages/flutter_tools/lib/src/asset.dart b/packages/flutter_tools/lib/src/asset.dart
+index 2dd08fda97..2c44647a80 100644
+--- a/packages/flutter_tools/lib/src/asset.dart
++++ b/packages/flutter_tools/lib/src/asset.dart
+@@ -7,6 +7,7 @@
+ import 'package:meta/meta.dart';
+ import 'package:package_config/package_config.dart';
+ 
++import 'base/common.dart';
+ import 'base/context.dart';
+ import 'base/file_system.dart';
+ import 'base/logger.dart';
+diff --git a/packages/flutter_tools/lib/src/cache.dart b/packages/flutter_tools/lib/src/cache.dart
+index 8cdd95d2ab..cde272c3d1 100644
+--- a/packages/flutter_tools/lib/src/cache.dart
++++ b/packages/flutter_tools/lib/src/cache.dart
+@@ -323,8 +323,15 @@ class Cache {
+       return;
+     }
+     assert(_lock == null);
++
++    final Directory dir = globals.fs.directory(globals.fs.path.join(_fsUtils.homeDirPath, '.cache', 'flutter'));
++    if (!dir.existsSync()) {
++      dir.createSync(recursive: true);
++      globals.os.chmod(dir, '755');
++    }
++
+     final File lockFile =
+-      _fileSystem.file(_fileSystem.path.join(flutterRoot, 'bin', 'cache', 'lockfile'));
++        _fileSystem.file(_fileSystem.path.join(_fsUtils.homeDirPath, '.cache', 'flutter', 'lockfile'));
+     try {
+       _lock = lockFile.openSync(mode: FileMode.write);
+     } on FileSystemException catch (e) {
+@@ -426,7 +433,7 @@ class Cache {
+     if (_rootOverride != null) {
+       return _fileSystem.directory(_fileSystem.path.join(_rootOverride.path, 'bin', 'cache'));
+     } else {
+-      return _fileSystem.directory(_fileSystem.path.join(flutterRoot, 'bin', 'cache'));
++      return _fileSystem.directory(_fileSystem.path.join(_fsUtils.homeDirPath, '.cache', 'flutter'));
+     }
+   }
+ 
+@@ -1170,7 +1177,7 @@ class AndroidMavenArtifacts extends ArtifactSet {
+     );
+     try {
+       final String gradleExecutable = gradle.absolute.path;
+-      final String flutterSdk = globals.fsUtils.escapePath(Cache.flutterRoot);
++      final String flutterSdk = _fsUtils.escapePath(Cache.flutterRoot);
+       final RunResult processResult = await globals.processUtils.run(
+         <String>[
+           gradleExecutable,
