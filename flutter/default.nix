@@ -9,10 +9,10 @@ in {
   mkFlutter = mkFlutter;
   dev = mkFlutter rec {
     pname = "flutter";
-    channel = "dev";
-    version = "1.27.0-1.0.pre";
+    channel = "stable";
+    version = "3.3.10";
     filename = "flutter_linux_${version}-${channel}.tar.xz";
-    sha256Hash = "1qa767rxwxzzv0xfw3vs48cqab7fhmw4dhnmw8g0q7z11k9wicw9";
+    sha256Hash = "sha256-0k6D96a4KdFj/u7xq/zDCGnwxdGvk+mRdCYmXa1QcCQ=";
     patches = getPatches ./patches/dev;
   };
 }

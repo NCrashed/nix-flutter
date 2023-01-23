@@ -2,7 +2,7 @@
 , filename ? "flutter_linux_v${version}-${channel}.tar.xz"
 }:
 
-{ bash, unzip, curl, buildFHSUserEnv, cacert, coreutils, git, makeWrapper, runCommand, stdenv
+{ bash, unzip, curl, buildFHSUserEnv, cacert, coreutils, git, makeWrapper, runCommand, stdenv, lib
 , fetchurl, alsaLib, dbus, expat, libpulseaudio, libuuid, libGL, nspr, nss, systemd }:
 
 let
@@ -11,8 +11,8 @@ let
     name = "${drvName}-online";
 
     src = fetchurl {
-      url =
-        "https://storage.googleapis.com/flutter_infra/releases/${channel}/linux/${filename}";
+      url = 
+        "https://storage.googleapis.com/flutter_infra_release/releases/${channel}/linux/${filename}";
       sha256 = sha256Hash;
     };
     buildInputs = [ curl unzip cacert git ];
@@ -111,7 +111,7 @@ in runCommand drvName {
   preferLocalBuild = true;
   allowSubstitutes = false;
   passthru = { unwrapped = flutter; };
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description =
       "Flutter is Google's SDK for building mobile, web and desktop with Dart.";
     longDescription = ''
